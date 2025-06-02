@@ -1,11 +1,11 @@
 from itertools import product
+from random import choice
 
 def generate_all_candidates(colors, slots):
     return list(product(colors, repeat=slots))
 
 def generate_secret_code(colors, length):
-    import random
-    return [random.choice(colors) for _ in range(length)]
+    return [choice(colors) for _ in range(length)]
 
 def get_feedback(secret, guess):
     black = sum(s == g for s, g in zip(secret, guess))

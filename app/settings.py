@@ -1,5 +1,5 @@
 # Configurable Settings
 
-DEFAULT_COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple', 'Cyan', 'Pink']
+DEFAULT_COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple', 'Cyan', 'Pink', 'Brown', 'Black']
 DEFAULT_CODE_LENGTH = 4
 DEFAULT_SLOT_COUNT = 4

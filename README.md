@@ -28,12 +28,21 @@ Try to guess the hidden color sequence within limited attempts. After each guess
 ## ⚙️ Configuration
 
 You can customize:
-- Number of colors (`6–8`)
+- Number of colors (`4–10`)
 - Code length (`4–6`)
-- Run sizes for benchmarking (`10`, `50`, `100`)
-- Enable/disable helper hints
+- Get Probability hints
 
 Modify values in `app/settings.py` or pass as parameters in solver/benchmark scripts.
+
+---
+
+## 🚀 Download Executable
+
+You can download the latest `.exe` version of the CodeBreaker game here:
+
+👉 [CodeBreaker v1.0 Release](https://github.com/narendra3003/codebreaker/releases/latest)
+
+No installation required — just extract and run `codebreaker.exe`.
 
 ---
 

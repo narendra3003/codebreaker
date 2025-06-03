@@ -1,10 +1,15 @@
 import tkinter as tk
-from tkinter import messagebox, Toplevel, Text, Scrollbar, RIGHT, Y
+from tkinter import Tk, messagebox, Toplevel, Text, Scrollbar, RIGHT, Y
 from app.helpers import (
     generate_all_candidates, generate_secret_code,
     get_feedback, filter_candidates, calculate_color_probabilities_by_position
 )
-from app.settings import DEFAULT_COLORS, DEFAULT_CODE_LENGTH, DEFAULT_SLOT_COUNT
+from app.settings import (
+    DEFAULT_COLORS, DEFAULT_SLOT_COUNT,
+    DEFAULT_COLORS_COUNT, DEFAULT_MAX_SLOTS, DEFAULT_MIN_SLOTS,
+    DEFAULT_MAX_COLORS, DEFAULT_MIN_COLORS
+)
+
 
 class CodeBreakerApp:
     def __init__(self, root):
@@ -12,7 +17,7 @@ class CodeBreakerApp:
         self.root.title("🎯 CodeBreaker Game")
         self.root.geometry("800x400")
         self.root.resizable(False, False)
-        self.selected_color_count = len(DEFAULT_COLORS)
+        self.selected_color_count = DEFAULT_COLORS_COUNT
         self.selected_slots = DEFAULT_SLOT_COUNT
         self.colors = DEFAULT_COLORS[:self.selected_color_count]
         self.code_length = self.selected_slots
@@ -47,9 +52,19 @@ class CodeBreakerApp:
         self.button_frame.pack()
         self.color_buttons = []
         for i, c in enumerate(self.colors):
-            b = tk.Button(self.button_frame, text=c, bg=c.lower(), fg="white", command=lambda i=i: self.select_color(i))
-            b.pack(side=tk.LEFT, padx=2)
+            b = tk.Button(
+                self.button_frame,
+                text=c,
+                bg=c.lower(),
+                fg="white",
+                font=("Helvetica", 10, "bold"),
+                width=8,
+                relief=tk.RAISED,
+                command=lambda i=i: self.select_color(i)
+            )
+            b.pack(side=tk.LEFT, padx=4)
             self.color_buttons.append(b)
+
 
         self.submit_btn = tk.Button(self.root, text="✅ Submit", command=self.submit_guess, state=tk.DISABLED)
         self.submit_btn.pack(pady=5)
@@ -61,6 +76,22 @@ class CodeBreakerApp:
         self.feedback_label = tk.Label(self.root, text="", font=("Arial", 12))
         self.feedback_label.pack(pady=5)
         tk.Button(self.root, text="⚙️ Settings", command=self.settings_window).pack(pady=5)
+        tk.Button(self.root, text="ℹ️ What do symbols mean?", command=self.show_legend).pack(pady=5)
+
+    def show_legend(self):
+        messagebox.showinfo("Symbol Legend", 
+            "⚫ Black = correct color in correct position\n"
+            "⚪ Gray  = correct color in wrong position\n"
+            "⬜ Light Gray = wrong color")
+        
+    def show_tooltip(self, widget, text):
+        tip = Toplevel(widget)
+        tip.wm_overrideredirect(True)
+        tip.geometry(f"+{widget.winfo_rootx() + 20}+{widget.winfo_rooty() + 10}")
+        label = tk.Label(tip, text=text, background="#ffffe0", relief=tk.SOLID, borderwidth=1)
+        label.pack()
+        widget.bind("<Leave>", lambda e: tip.destroy())
+
 
     def reset_widgets(self):
         for widget in self.guess_frame.winfo_children():
@@ -75,9 +106,19 @@ class CodeBreakerApp:
             widget.destroy()
         self.color_buttons = []
         for i, c in enumerate(self.colors):
-            b = tk.Button(self.button_frame, text=c, bg=c.lower(), fg="white", command=lambda i=i: self.select_color(i))
-            b.pack(side=tk.LEFT, padx=2)
+            b = tk.Button(
+                self.button_frame,
+                text=c,
+                bg=c.lower(),
+                fg="white",
+                font=("Helvetica", 10, "bold"),
+                width=8,
+                relief=tk.RAISED,
+                command=lambda i=i: self.select_color(i)
+            )
+            b.pack(side=tk.LEFT, padx=4)
             self.color_buttons.append(b)
+
 
     def select_color(self, index):
         if self.current_index < self.code_length:
@@ -96,13 +137,22 @@ class CodeBreakerApp:
 
     def submit_guess(self):
         black, white = get_feedback(self.secret_code, self.guess)
-        self.feedback_label.config(text=f"[Guess] {self.guess}  ->  Black Pegs: {black}, White Pegs: {white}")
+        
+        # Generate visual feedback
+        visual_feedback = ""
+        visual_feedback += "⚫" * black      # Correct color & position
+        visual_feedback += "⚪" * white      # Correct color, wrong position
+        visual_feedback += "⬜" * (self.code_length - black - white)  # Wrong color
+
+        self.feedback_label.config(text=f"[{visual_feedback}]  Guess: {self.guess}")
+
         self.current_candidates = filter_candidates(self.current_candidates, self.guess, (black, white))
         if black == self.code_length:
-            messagebox.showinfo("🎉 You Won!", "You cracked the code!")
+            messagebox.showinfo("🎉 You Won!", f"You cracked the code!\nSecret: {self.secret_code}")
             self.full_reset()
         else:
             self.reset_for_next()
+
 
     def reset_for_next(self):
         self.guess = []
@@ -132,30 +182,33 @@ class CodeBreakerApp:
         settings.title("⚙️ Game Settings")
         settings.geometry("300x200")
 
-        tk.Label(settings, text="Slots (2-6):").pack(pady=5)
+
+        tk.Label(settings, text=f"Slots ({DEFAULT_MIN_SLOTS}-{DEFAULT_MAX_SLOTS}):").pack(pady=5)
         slot_var = tk.IntVar(value=self.selected_slots)
-        tk.Spinbox(settings, from_=2, to=6, textvariable=slot_var, width=5).pack()
-
-        tk.Label(settings, text="Colors (4-10):").pack(pady=5)
+        tk.Spinbox(settings, from_=DEFAULT_MIN_SLOTS, to=DEFAULT_MAX_SLOTS, textvariable=slot_var, width=5).pack()
+        tk.Label(settings, text=f"Colors ({DEFAULT_MIN_COLORS}-{DEFAULT_MAX_COLORS}):").pack(pady=5)
         color_var = tk.IntVar(value=self.selected_color_count)
-        tk.Spinbox(settings, from_=4, to=10, textvariable=color_var, width=5).pack()
-
+        tk.Spinbox(settings, from_=DEFAULT_MIN_COLORS, to=DEFAULT_MAX_COLORS, textvariable=color_var, width=5).pack()
         tk.Button(settings, text="Apply", command=apply_settings).pack(pady=10)
+
 
     def show_probabilities(self):
         self.color_probability_by_position = calculate_color_probabilities_by_position(
             self.current_candidates, self.code_length, self.colors
         )
         win = Toplevel(self.root)
-        win.title("Color Probabilities by Position")
-        text = Text(win, wrap=tk.WORD, font=("Courier", 10), height=15, width=60)
+        win.title("📊 Color Probabilities by Position")
+        win.geometry("450x350")
+        header = tk.Label(win, text="🎯 Probability Hints", font=("Helvetica", 14, "bold"), pady=10)
+        header.pack()
+        text = Text(win, wrap=tk.WORD, font=("Courier", 11), height=15, width=50, bg="#1e1e1e", fg="#ffffff")
         scroll = Scrollbar(win, command=text.yview)
         text.config(yscrollcommand=scroll.set)
-        text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=5)
         scroll.pack(side=RIGHT, fill=Y)
-
         for i in range(self.code_length):
-            text.insert(tk.END, f"Position {i+1}:\n")
-            for color, prob in self.color_probability_by_position[i].items():
-                text.insert(tk.END, f"  {color:<8}: {prob:.2f}\n")
-            text.insert(tk.END, "\n")
+            text.insert(tk.END, f"\n🔢 Position {i+1}:\n")
+            sorted_probs = sorted(self.color_probability_by_position[i].items(), key=lambda x: -x[1])
+            for color, prob in sorted_probs:
+                bar = "█" * int(prob * 20)  # Visual probability bar
+                text.insert(tk.END, f"{color:<10}: {prob:.2f} {bar}\n")

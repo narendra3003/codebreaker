@@ -3,3 +3,9 @@ random
 itertools
 pandas
 matplotlib
+statistics
+seaborn
+time
+collections
+os
+csv

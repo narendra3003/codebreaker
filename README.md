@@ -11,7 +11,7 @@ A Python-based implementation of the classic **CodeBreaker** game — with a GUI
 - 🤖 **Solver AI bots**:
   - **Random Guesser**
   - **Knuth’s Algorithm**
-  - **Entropy-based Greedy Solver**
+  - **Greedy Solver**
 - 📊 **Benchmarking engine**: Run simulations for different configurations, track average guesses & runtimes
 
 ---
@@ -59,7 +59,7 @@ codebreaker/
 ├── solvers/          # AI solvers
 │   ├── random_solver.py
 │   ├── knuth_solver.py
-│   ├── entropy_solver.py
+│   ├── greedy_solver.py
 │   └── solver_utils.py
 │
 ├── experiments/      # Benchmarking experiment
@@ -92,20 +92,21 @@ python app/gui.py
 ```
 
 ### 3. Run Benchmarks
-
-```bash
-python experiments/benchmark_runner.py
-```
+Just click on ▷ button in sidebar
 
 ---
 
 ## 📊 Sample Benchmark Output
 
-| Config              | Random Avg | Knuth Avg | Entropy Avg | Runtime (ms) |
-| ------------------- | ---------- | --------- | ----------- | ------------ |
-| Slots: 4, Colors: 6 | 6.2        | 4.3       | 4.5         | 32           |
-| Slots: 5, Colors: 7 | 7.8        | 5.6       | 5.2         | 41           |
-| Slots: 6, Colors: 8 | 8.9        | 6.4       | 6.1         | 52           |
+📊 Configuration: SLOTS=5, COLORS=5, RUNS=50
+============================================================
+Algorithm   Avg Attempts   Avg Time (s)   
+------------------------------------------------------------
+Random      4.64           0.0088         
+Greedy      5.38           0.0117         
+fixed_start 5.24           0.0081         
+Knuth       4.46           2.8326         
+============================================================
 
 ---
 
@@ -113,7 +114,7 @@ python experiments/benchmark_runner.py
 
 * Python 🐍
 * Tkinter 🎨
-* itertools, random, time
+* itertools, random, time, statistics
 * Solver logic inspired by Donald Knuth’s 5-guess algorithm
 
 ---

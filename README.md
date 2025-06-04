@@ -97,7 +97,7 @@ Just click on ▷ button in sidebar
 ---
 
 ## 📊 Sample Benchmark Output
-
+```
 📊 Configuration: SLOTS=5, COLORS=5, RUNS=50
 ============================================================
 Algorithm   Avg Attempts   Avg Time (s)   
@@ -107,6 +107,7 @@ Greedy      5.38           0.0117
 fixed_start 5.24           0.0081         
 Knuth       4.46           2.8326         
 ============================================================
+```
 
 ---
 
